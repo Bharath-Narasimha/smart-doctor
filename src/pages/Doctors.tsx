@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Filter, MapPin, Star, Clock, Phone } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 
 interface Doctor {
   id: number
@@ -78,7 +78,7 @@ const Doctors: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="px-6 py-8 space-y-8">
         {/* Enhanced Header */}
         <div className="slide-in">

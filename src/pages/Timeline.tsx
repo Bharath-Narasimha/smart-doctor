@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Calendar, FileText, User, Clock, Filter, TrendingUp } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 
 interface TimelineEvent {
   id: number
@@ -100,7 +100,7 @@ const Timeline: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="px-4 py-6 space-y-6">
         {/* Header */}
         <div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Send, Bot } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 
 interface Message {
   id: string
@@ -76,7 +76,7 @@ const SymptomChat: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="flex flex-col h-full">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 p-4">

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload, MessageCircle, MapPin, TrendingUp, Brain, User, Camera } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 import UserHeader from '../components/UserHeader'
 import UpcomingSchedule from '../components/UpcomingSchedule'
 import DoctorFinder from '../components/DoctorFinder'
@@ -64,7 +64,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="px-6 py-8 space-y-8">
         {/* Enhanced Header with Animation */}
         <div className="slide-in">
@@ -80,7 +80,7 @@ const Home: React.FC = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold gradient-text">
-              Quick Actions
+              Quick Actions Shaik Mahammad Ateeq
             </h2>
             <div className="w-8 h-8 premium-icon float-animation">
               <Brain className="w-4 h-4 text-white" />

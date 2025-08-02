@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, AlertTriangle, Clock, User, MessageCircle, Calendar } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 import AIResultCard from '../components/AIResultCard'
 
 const AIResult: React.FC = () => {
@@ -42,7 +42,7 @@ const AIResult: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="px-4 py-6 space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-4">

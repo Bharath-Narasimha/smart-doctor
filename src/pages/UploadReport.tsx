@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload, FileText, Image, X, ArrowLeft, CheckCircle, Brain } from 'lucide-react'
-import StatusBar from '../components/StatusBar'
+import AppHeader from '../components/AppHeader'
 
 const UploadReport: React.FC = () => {
   const navigate = useNavigate()
@@ -50,7 +50,7 @@ const UploadReport: React.FC = () => {
 
   return (
     <div className="mobile-container">
-      <StatusBar />
+      <AppHeader />
       <div className="px-6 py-8 space-y-8">
         {/* Enhanced Header */}
         <div className="slide-in">
