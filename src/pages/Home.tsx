@@ -80,7 +80,7 @@ const Home: React.FC = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold gradient-text">
-              Quick Actions Shaik Mahammad Ateeq
+              Quick Actions
             </h2>
             <div className="w-8 h-8 premium-icon float-animation">
               <Brain className="w-4 h-4 text-white" />
