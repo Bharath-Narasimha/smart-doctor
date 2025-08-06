@@ -1,13 +1,37 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload, FileText, Image, X, ArrowLeft, CheckCircle, Brain } from 'lucide-react'
 import AppHeader from '../components/AppHeader'
+import { OCRService } from '../services/OCRService'
+import { MLModelService } from '../services/MLModelService'
+import { MedicalParameters } from '../services/OCRService'
+import { HealthAnalysis } from '../services/MLModelService'
 
 const UploadReport: React.FC = () => {
   const navigate = useNavigate()
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [dragActive, setDragActive] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [mlService, setMlService] = useState<MLModelService | null>(null)
+
+  // Initialize ML service on component mount
+  useEffect(() => {
+    const initializeML = async () => {
+      try {
+        console.log('Initializing ML service...')
+        const service = MLModelService.getInstance()
+        await service.initializeModels()
+        setMlService(service)
+        console.log('ML service initialized successfully')
+      } catch (error) {
+        console.error('Failed to initialize ML models:', error)
+        console.log('Continuing without ML models...')
+        setMlService(MLModelService.getInstance())
+      }
+    }
+    initializeML()
+  }, [])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -26,26 +50,56 @@ const UploadReport: React.FC = () => {
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setUploadedFile(e.dataTransfer.files[0])
+      setError(null)
     }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setUploadedFile(e.target.files[0])
+      setError(null)
     }
   }
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!uploadedFile || !mlService) {
+      setError('Please upload a file and ensure ML service is ready')
+      return
+    }
+
     setIsAnalyzing(true)
-    // Simulate AI analysis
-    setTimeout(() => {
+    setError(null)
+
+    try {
+      console.log('Starting analysis for file:', uploadedFile.name)
+      
+      // Extract medical parameters using OCR
+      const parameters = await OCRService.getInstance().extractMedicalParameters(uploadedFile)
+      console.log('Extracted parameters:', parameters)
+      
+      // Analyze health using ML models
+      const analysis = await mlService.analyzeHealth(parameters)
+      console.log('Health analysis:', analysis)
+      
+      // Navigate to AI result page with the analysis data
+      console.log('Navigating to AI result page...')
+      navigate('/ai-result', {
+        state: {
+          analysis,
+          parameters
+        }
+      })
+    } catch (error) {
+      console.error('Analysis failed:', error)
+      setError(`Failed to analyze the report: ${error instanceof Error ? error.message : 'Unknown error'}. Please ensure the image is clear and try again.`)
+    } finally {
       setIsAnalyzing(false)
-      navigate('/result')
-    }, 3000)
+    }
   }
 
   const removeFile = () => {
     setUploadedFile(null)
+    setError(null)
   }
 
   return (
@@ -141,11 +195,24 @@ const UploadReport: React.FC = () => {
             )}
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start">
+                <X className="w-5 h-5 text-red-600 mr-2 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-medium text-red-900 mb-1">Analysis Error</h4>
+                  <p className="text-sm text-red-800">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Enhanced Analysis Button */}
           {uploadedFile && (
             <button
               onClick={handleAnalyze}
-              disabled={isAnalyzing}
+              disabled={isAnalyzing || !mlService}
               className="w-full btn-primary py-5 px-6 text-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3"
             >
               {isAnalyzing ? (
@@ -161,6 +228,13 @@ const UploadReport: React.FC = () => {
               )}
             </button>
           )}
+
+          {/* Debug Info */}
+          <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600">
+            <p>ML Service: {mlService ? 'Ready' : 'Loading...'}</p>
+            <p>File: {uploadedFile ? uploadedFile.name : 'None'}</p>
+            <p>Can Analyze: {uploadedFile && mlService ? 'Yes' : 'No'}</p>
+          </div>
         </div>
 
         {/* Enhanced Instructions */}

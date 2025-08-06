@@ -1,186 +1,183 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, AlertTriangle, Clock, User, MessageCircle, Calendar } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { ArrowLeft, Download, Share2, Heart, TrendingUp, AlertTriangle, User, MessageCircle, Calendar } from 'lucide-react'
 import AppHeader from '../components/AppHeader'
-import AIResultCard from '../components/AIResultCard'
+import AIAnalysis from '../components/AIAnalysis'
+import { HealthAnalysis } from '../services/MLModelService'
+import { MedicalParameters } from '../services/OCRService'
+
+interface LocationState {
+  analysis: HealthAnalysis
+  parameters: MedicalParameters
+}
 
 const AIResult: React.FC = () => {
   const navigate = useNavigate()
-  const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const location = useLocation()
+  const [analysis, setAnalysis] = useState<HealthAnalysis | null>(null)
+  const [parameters, setParameters] = useState<MedicalParameters | null>(null)
 
-  const result = {
-    disease: "Pneumonia",
-    confidence: 87,
-    severity: "medium",
-    isSerious: true,
-    isCurable: true,
-    specialist: "Pulmonologist",
-    recommendations: [
-      "Immediate consultation with a pulmonologist recommended",
-      "Complete the prescribed antibiotic course",
-      "Rest and maintain proper hydration",
-      "Monitor oxygen levels regularly"
-    ]
+  useEffect(() => {
+    const state = location.state as LocationState
+    if (state?.analysis && state?.parameters) {
+      setAnalysis(state.analysis)
+      setParameters(state.parameters)
+    } else {
+      // If no data, redirect back to upload
+      navigate('/upload')
+    }
+  }, [location, navigate])
+
+  const handleDownload = () => {
+    if (!analysis || !parameters) return
+
+    const reportData = {
+      timestamp: new Date().toISOString(),
+      overallHealthScore: analysis.overallHealthScore,
+      diseaseRisks: analysis.diseaseRisks,
+      recommendations: analysis.recommendations,
+      nextSteps: analysis.nextSteps,
+      extractedParameters: parameters
+    }
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `health-analysis-${new Date().toISOString().split('T')[0]}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => 
-      prev.includes(section) 
-        ? prev.filter(s => s !== section)
-        : [...prev, section]
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'My Health Analysis Results',
+          text: `My overall health score is ${analysis?.overallHealthScore}%. Check out my detailed health analysis!`,
+          url: window.location.href
+        })
+      } catch (error) {
+        console.log('Error sharing:', error)
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href)
+      alert('Link copied to clipboard!')
+    }
+  }
+
+  if (!analysis || !parameters) {
+    return (
+      <div className="mobile-container">
+        <AppHeader />
+        <div className="px-6 py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading analysis results...</p>
+          </div>
+        </div>
+      </div>
     )
   }
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
+  const criticalRisks = analysis.diseaseRisks.filter(risk => risk.severity === 'Critical')
+  const highRisks = analysis.diseaseRisks.filter(risk => risk.severity === 'High')
 
   return (
     <div className="mobile-container">
       <AppHeader />
-      <div className="px-4 py-6 space-y-6">
+      
+      <div className="px-6 py-6 space-y-4">
         {/* Header */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between">
           <button
-            onClick={() => navigate(-1)}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            onClick={() => navigate('/upload')}
+            className="p-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-900">
-            AI Analysis Result
-          </h1>
+          <h1 className="text-lg font-bold gradient-text">Health Analysis</h1>
+          <div className="flex space-x-1">
+            <button
+              onClick={handleDownload}
+              className="p-1.5 text-gray-600 hover:text-blue-600"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleShare}
+              className="p-1.5 text-gray-600 hover:text-blue-600"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Main Result Card */}
-        <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900">
-                {result.disease}
-              </h4>
-              <div className="flex items-center space-x-2 mt-1">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSeverityColor(result.severity)}`}>
-                  {result.severity.toUpperCase()} SEVERITY
-                </span>
-                <span className="text-sm text-gray-600">
-                  {result.confidence}% confidence
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Assessment */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <AlertTriangle className="w-6 h-6 text-red-500 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-900">
-                {result.isSerious ? 'Serious' : 'Not Serious'}
-              </p>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-900">
-                {result.isCurable ? 'Curable' : 'Chronic'}
-              </p>
-            </div>
-          </div>
-
-          {/* Specialist Recommendation */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-4">
-            <div className="flex items-center space-x-3">
-              <User className="w-5 h-5 text-blue-600" />
+        {/* Compact Alerts */}
+        {criticalRisks.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <div className="flex items-start">
+              <AlertTriangle className="w-4 h-4 text-red-600 mr-2 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-gray-900">
-                  Recommended Specialist
+                <h4 className="text-xs font-medium text-red-900 mb-1">Critical Alert</h4>
+                <p className="text-xs text-red-800">
+                  {criticalRisks.length} condition{criticalRisks.length > 1 ? 's' : ''} require{criticalRisks.length > 1 ? '' : 's'} immediate attention.
                 </p>
-                <p className="text-blue-600 font-semibold">{result.specialist}</p>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Expandable Sections */}
-        <div className="space-y-3">
-          {/* Recommendations Section */}
-          <div className="bg-white rounded-xl border border-gray-200">
-            <button
-              onClick={() => toggleSection('recommendations')}
-              className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50"
-            >
-              <span className="font-medium text-gray-900">Recommendations</span>
-              <Clock className={`w-5 h-5 text-gray-400 transition-transform ${
-                expandedSections.includes('recommendations') ? 'rotate-180' : ''
-              }`} />
-            </button>
-            {expandedSections.includes('recommendations') && (
-              <div className="px-4 pb-4">
-                <ul className="space-y-2">
-                  {result.recommendations.map((rec, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                      <span className="text-sm text-gray-700">{rec}</span>
-                    </li>
-                  ))}
-                </ul>
+        {highRisks.length > 0 && criticalRisks.length === 0 && (
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+            <div className="flex items-start">
+              <AlertTriangle className="w-4 h-4 text-orange-600 mr-2 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-xs font-medium text-orange-900 mb-1">High Risk Alert</h4>
+                <p className="text-xs text-orange-800">
+                  {highRisks.length} condition{highRisks.length > 1 ? 's' : ''} show{highRisks.length > 1 ? '' : 's'} elevated risk levels.
+                </p>
               </div>
-            )}
+            </div>
           </div>
+        )}
 
-          {/* Treatment Plan Section */}
-          <div className="bg-white rounded-xl border border-gray-200">
-            <button
-              onClick={() => toggleSection('treatment')}
-              className="w-full p-4 text-left flex items-center justify-between hover:bg-gray-50"
-            >
-              <span className="font-medium text-gray-900">Treatment Plan</span>
-              <Clock className={`w-5 h-5 text-gray-400 transition-transform ${
-                expandedSections.includes('treatment') ? 'rotate-180' : ''
-              }`} />
-            </button>
-            {expandedSections.includes('treatment') && (
-              <div className="px-4 pb-4">
-                <div className="space-y-3">
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <h5 className="font-medium text-green-800 mb-1">Immediate Actions</h5>
-                    <p className="text-sm text-green-700">Schedule appointment with pulmonologist within 48 hours</p>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <h5 className="font-medium text-blue-800 mb-1">Medications</h5>
-                    <p className="text-sm text-blue-700">Complete prescribed antibiotic course as directed</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        {/* AI Analysis Component */}
+        <AIAnalysis 
+          analysis={analysis} 
+          parameters={parameters}
+        />
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <button 
-            onClick={() => navigate('/chat-report')}
-            className="w-full bg-blue-600 text-white py-3 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
-          >
-            <MessageCircle className="w-5 h-5" />
-            <span>Chat with AI about this report</span>
-          </button>
-          <button 
+        {/* Simplified Action Buttons */}
+        <div className="space-y-2">
+          <button
             onClick={() => navigate('/doctors')}
-            className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+            className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
           >
-            <Calendar className="w-5 h-5" />
-            <span>Find and Book Specialist</span>
+            <User className="w-4 h-4 mr-2" />
+            Find a Doctor
           </button>
+          
+          <button
+            onClick={() => navigate('/symptoms')}
+            className="w-full bg-green-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center"
+          >
+            <MessageCircle className="w-4 h-4 mr-2" />
+            Get Symptom Advice
+          </button>
+        </div>
+
+        {/* Compact Information */}
+        <div className="bg-gray-50 rounded-lg p-3">
+          <h4 className="text-xs font-medium text-gray-900 mb-2">About This Analysis</h4>
+          <div className="space-y-1 text-xs text-gray-600">
+            <p>• AI-powered analysis based on medical data</p>
+            <p>• Risk estimates for informational purposes only</p>
+            <p>• Always consult healthcare professionals</p>
+          </div>
         </div>
       </div>
     </div>
