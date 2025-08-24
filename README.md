@@ -1,68 +1,35 @@
-# Smart Doctor - AI-Powered Medical Assistant
+# Smart Doctor - AI Medical Report Analysis
 
-A comprehensive mobile-first web application that uses advanced AI technology to analyze medical reports and provide health insights.
+A React-based mobile application that uses AI to scan medical reports (PDFs/images), extract medical values, and predict disease risk using machine learning models.
 
-## 🚀 New AI Features
+## Features
 
-### OCR (Optical Character Recognition)
-- **Tesseract.js Integration**: Advanced text extraction from medical reports
-- **Medical Parameter Extraction**: Automatically extracts key health metrics including:
-  - Blood test parameters (glucose, cholesterol, HDL, LDL, triglycerides, creatinine, BUN, ALT, AST, bilirubin, hemoglobin, WBC, RBC, platelets)
-  - Vital signs (blood pressure, heart rate, temperature)
-  - Body metrics (BMI, weight, height, age)
-  - Liver function tests (albumin, alkaline phosphatase, total protein)
-  - Kidney function tests (glomerular filtration rate, urine albumin)
+- **AI-Powered Report Scanning**: Automatically extracts medical values from PDFs and images using OCR
+- **Multi-Disease Support**: Heart Disease, Diabetes, Kidney Disease, and Liver Disease prediction
+- **Smart Report Detection**: Automatically identifies report type based on content
+- **Interactive Value Editing**: Review and edit extracted values before analysis
+- **Real-time API Integration**: Connects to disease prediction API for instant results
+- **Beautiful Results Display**: Structured presentation of risk assessment, factors, and recommendations
+- **Mobile-First Design**: Optimized for mobile devices with responsive UI
 
-### Machine Learning Disease Risk Prediction
-- **TensorFlow.js Models**: Pre-trained neural networks for disease risk assessment
-- **Multi-Disease Analysis**: Risk prediction for:
-  - Heart Disease
-  - Diabetes
-  - Liver Disease
-  - Kidney Disease
-- **Personalized Recommendations**: AI-generated health advice and next steps
-- **Risk Severity Levels**: Low, Medium, High, and Critical risk classifications
+## Technology Stack
 
-### Advanced Health Analytics
-- **Overall Health Score**: Comprehensive health assessment (0-100%)
-- **Disease-Specific Risk Percentages**: Detailed risk analysis for each condition
-- **Smart Recommendations**: Personalized lifestyle and medical advice
-- **Actionable Next Steps**: Clear guidance for follow-up actions
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **OCR Processing**: Tesseract.js for image text extraction
+- **PDF Processing**: PDF.js for PDF text extraction
+- **API Integration**: Axios for HTTP requests
+- **Containerization**: Docker + Docker Compose
+- **Build Tool**: Vite
 
-## 🛠️ Technology Stack
+## Prerequisites
 
-- **Frontend**: React 18 + TypeScript
-- **Styling**: Tailwind CSS
-- **OCR**: Tesseract.js
-- **Machine Learning**: TensorFlow.js
-- **Charts**: Chart.js + React-Chartjs-2
-- **Routing**: React Router DOM
-- **Icons**: Lucide React
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- Disease Prediction API service running on port 8000
 
-## 📱 Features
+## Quick Start
 
-### Core Functionality
-- **Medical Report Upload**: Drag & drop support for PDF, JPG, PNG files
-- **AI-Powered Analysis**: Automated health parameter extraction and risk assessment
-- **Interactive Results**: Beautiful, responsive UI with progress indicators
-- **Health Timeline**: Track your health journey over time
-- **Doctor Finder**: Locate nearby medical specialists
-- **Symptom Chat**: AI-powered symptom analysis
-
-### User Experience
-- **Mobile-First Design**: Optimized for mobile devices
-- **Real-time Processing**: Live progress updates during analysis
-- **Error Handling**: Graceful error management with user-friendly messages
-- **Data Export**: Download analysis results as JSON
-- **Share Functionality**: Share results with healthcare providers
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-
-### Installation
+### Option 1: Docker (Recommended)
 
 1. **Clone the repository**
    ```bash
@@ -70,65 +37,179 @@ A comprehensive mobile-first web application that uses advanced AI technology to
    cd smart-doctor
    ```
 
-2. **Install dependencies**
+2. **Start the services**
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the application**
+   - Frontend: http://localhost:3000
+   - API: http://localhost:8000
+
+### Option 2: Local Development
+
+1. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. **Start the development server**
+2. **Start development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
+3. **Access the application**
+   - Frontend: http://localhost:5173
+   - Ensure API is running on http://localhost:8000
 
-## 📋 Usage
+## How It Works
 
-### Uploading Medical Reports
-1. Navigate to the "Upload Report" section
-2. Drag and drop your medical report (PDF, JPG, PNG) or click to browse
-3. Click "Analyze Report with AI"
-4. Wait for OCR processing and ML analysis
-5. Review your personalized health insights
+### 1. Report Upload
+- User uploads medical report (PDF or image)
+- Supports: PDF, JPG, PNG, TIFF, BMP formats
 
-### Understanding Results
-- **Overall Health Score**: Your comprehensive health rating
-- **Disease Risk Analysis**: Individual risk assessments for major conditions
-- **Extracted Parameters**: Key health metrics found in your report
-- **Recommendations**: Personalized health advice
-- **Next Steps**: Actionable follow-up guidance
+### 2. AI Scanning
+- **OCR Processing**: Uses Tesseract.js for image text extraction
+- **PDF Processing**: Uses PDF.js for PDF text extraction
+- **Report Type Detection**: Automatically identifies disease type based on content
 
-## 🔧 Technical Architecture
+### 3. Value Extraction
+- **Heart Disease**: Extracts 13 parameters (age, sex, blood pressure, cholesterol, etc.)
+- **Diabetes**: Extracts 8 parameters (glucose, insulin, BMI, etc.)
+- **Kidney Disease**: Extracts 24 parameters (creatinine, urea, hemoglobin, etc.)
+- **Liver Disease**: Extracts 10 parameters (bilirubin, ALT, AST, etc.)
 
-### Services
-- **OCRService**: Handles text extraction from medical reports
-- **MLModelService**: Manages TensorFlow.js models and predictions
-- **AIAnalysis**: Displays comprehensive health analysis results
+### 4. User Review
+- Displays extracted values with editable fields
+- Shows confidence score for extraction accuracy
+- Allows manual corrections before analysis
 
-### Components
-- **ReportUpload**: File upload and processing interface
-- **AIAnalysis**: Results display with charts and recommendations
-- **AIResult**: Dedicated results page with sharing capabilities
+### 5. Disease Prediction
+- Sends extracted values to appropriate API endpoint
+- Receives comprehensive risk assessment
+- Displays results with risk factors and recommendations
 
-## ⚠️ Important Disclaimers
+## API Integration
 
-- **Informational Purpose Only**: This AI analysis is for informational purposes only
-- **Not Medical Advice**: Always consult qualified healthcare providers for medical decisions
-- **Data Privacy**: Medical data is processed locally and not stored on servers
-- **Accuracy**: Results are estimates based on available parameters
+The app integrates with the Disease Prediction API service:
 
-## 🎯 Future Enhancements
+- **Health Check**: `/health` - API availability status
+- **Heart Disease**: `/predict/heart` - Heart disease risk prediction
+- **Diabetes**: `/predict/diabetes` - Diabetes risk prediction
+- **Kidney Disease**: `/predict/kidney` - Kidney disease risk prediction
+- **Liver Disease**: `/predict/liver` - Liver disease risk prediction
 
-- [ ] Integration with electronic health records (EHR)
-- [ ] Real-time health monitoring
-- [ ] Telemedicine integration
-- [ ] Advanced imaging analysis (X-ray, MRI)
-- [ ] Medication interaction checking
-- [ ] Health goal tracking
-- [ ] Family health history integration
+## Project Structure
 
-## 🤝 Contributing
+```
+src/
+├── components/
+│   ├── AppHeader.tsx          # App header component
+│   ├── BottomNav.tsx          # Bottom navigation
+│   ├── ExtractedValuesForm.tsx # Form for editing extracted values
+│   └── DiseasePredictionResult.tsx # Results display component
+├── pages/
+│   ├── Home.tsx               # Home page
+│   ├── UploadReport.tsx       # Main report analysis page
+│   └── ...                    # Other pages
+├── services/
+│   ├── api.ts                 # API service for disease prediction
+│   └── reportScanner.ts       # OCR and PDF processing service
+└── main.tsx                   # App entry point
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_APP_NAME=Smart Doctor
+```
+
+### API Configuration
+
+The API base URL can be configured in `src/services/api.ts`:
+
+```typescript
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+```
+
+## Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint (if configured)
+
+### Adding New Disease Types
+
+1. **Update Report Scanner**: Add detection logic in `reportScanner.ts`
+2. **Update API Service**: Add new prediction method in `api.ts`
+3. **Update UI Components**: Modify forms and result displays
+4. **Update Types**: Add new interfaces for parameters
+
+### Customizing OCR
+
+The OCR processing can be customized in `reportScanner.ts`:
+
+- **Language Support**: Add new languages to Tesseract.js
+- **Pattern Matching**: Improve regex patterns for value extraction
+- **Confidence Scoring**: Adjust confidence calculation algorithms
+
+## Docker Configuration
+
+### Frontend Container
+
+- **Base Image**: Node.js 18 Alpine
+- **OCR Tools**: Tesseract, Poppler, ImageMagick
+- **Port**: 3000
+- **Build Process**: Multi-stage build for optimization
+
+### API Container
+
+- **Base Image**: Python with ML dependencies
+- **Port**: 8000
+- **Health Check**: Automatic health monitoring
+
+## Troubleshooting
+
+### Common Issues
+
+1. **OCR Not Working**
+   - Ensure Docker container has Tesseract installed
+   - Check image format compatibility
+   - Verify file size limits
+
+2. **API Connection Failed**
+   - Check if disease prediction API is running
+   - Verify port 8000 is accessible
+   - Check network configuration in Docker
+
+3. **PDF Processing Errors**
+   - Ensure PDF.js worker is properly configured
+   - Check PDF file integrity
+   - Verify PDF page limits
+
+### Performance Optimization
+
+- **Image Processing**: Limit image file sizes
+- **PDF Processing**: Process only first 3 pages
+- **Caching**: Implement result caching for repeated reports
+- **Lazy Loading**: Load OCR libraries on demand
+
+## Security Considerations
+
+- **File Validation**: Strict file type and size validation
+- **Input Sanitization**: Clean extracted values before API calls
+- **Error Handling**: Graceful error handling without exposing sensitive data
+- **CORS Configuration**: Proper CORS setup for API communication
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -136,14 +217,17 @@ A comprehensive mobile-first web application that uses advanced AI technology to
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
-## 🆘 Support
+## Disclaimer
 
-For support and questions, please open an issue in the GitHub repository.
+This application is for educational and research purposes only. Medical predictions should not replace professional medical advice. Always consult with healthcare professionals for medical decisions.
 
----
+## Support
 
-**Note**: This application is designed to assist with health monitoring and should be used in conjunction with professional medical care. 
+For support and questions:
+- Create an issue in the repository
+- Check the troubleshooting section
+- Review the API documentation 

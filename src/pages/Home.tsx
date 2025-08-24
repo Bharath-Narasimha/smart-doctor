@@ -14,14 +14,14 @@ const Home: React.FC = () => {
     {
       icon: Upload,
       title: "Upload Report",
-      description: "Analyze medical reports",
+      description: "Upload medical reports",
       color: "bg-gradient-to-br from-blue-500 to-blue-600",
       route: "/upload"
     },
     {
       icon: MessageCircle,
       title: "Symptom Checker",
-      description: "AI chat diagnosis",
+      description: "Check your symptoms",
       color: "bg-gradient-to-br from-green-500 to-green-600",
       route: "/symptoms"
     },
@@ -40,23 +40,16 @@ const Home: React.FC = () => {
       route: "/timeline"
     },
     {
-      icon: Brain,
-      title: "Risk Prediction",
-      description: "AI health insights",
-      color: "bg-gradient-to-br from-red-500 to-red-600",
-      route: "/risk-prediction"
-    },
-    {
       icon: User,
       title: "Health Coach",
-      description: "Personalized guidance",
+      description: "Get guidance",
       color: "bg-gradient-to-br from-teal-500 to-teal-600",
       route: "/coach"
     },
     {
       icon: Camera,
       title: "Scan Symptoms",
-      description: "Visual diagnosis",
+      description: "Visual check",
       color: "bg-gradient-to-br from-pink-500 to-pink-600",
       route: "/scan"
     }

@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Send, Bot } from 'lucide-react'
+import { ArrowLeft, Send, MessageCircle } from 'lucide-react'
 import AppHeader from '../components/AppHeader'
 
 interface Message {
   id: string
   text: string
-  sender: 'user' | 'ai'
+  sender: 'user' | 'assistant'
   timestamp: Date
 }
 
@@ -15,8 +15,8 @@ const SymptomChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your AI health assistant. I can help you understand your symptoms and suggest possible conditions. What symptoms are you experiencing today?",
-      sender: 'ai',
+      text: "Hello! I'm your health assistant. I can help you understand common symptoms and provide general guidance. What symptoms are you experiencing today?",
+      sender: 'assistant',
       timestamp: new Date()
     }
   ])
@@ -37,31 +37,31 @@ const SymptomChat: React.FC = () => {
     setInputText('')
     setIsTyping(true)
 
-    // Simulate AI response
+    // Simulate response
     setTimeout(() => {
-      const aiResponse = generateAIResponse(inputText)
-      const aiMessage: Message = {
+      const response = generateResponse(inputText)
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: aiResponse,
-        sender: 'ai',
+        text: response,
+        sender: 'assistant',
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, aiMessage])
+      setMessages(prev => [...prev, assistantMessage])
       setIsTyping(false)
     }, 1500)
   }
 
-  const generateAIResponse = (userInput: string): string => {
+  const generateResponse = (userInput: string): string => {
     const symptoms = userInput.toLowerCase()
     
     if (symptoms.includes('fever') && symptoms.includes('cough')) {
-      return "Based on your symptoms of fever and cough, you might have a respiratory infection. How long have you been experiencing these symptoms? Also, do you have any difficulty breathing?"
+      return "Fever and cough are common symptoms of respiratory infections. Rest, stay hydrated, and monitor your temperature. If symptoms persist or worsen, consider consulting a healthcare provider."
     } else if (symptoms.includes('headache')) {
-      return "Headaches can have various causes. Is the pain on one side or both sides? How severe is it on a scale of 1-10? Are you experiencing any other symptoms like nausea or sensitivity to light?"
+      return "Headaches can have various causes like stress, dehydration, or eye strain. Try resting in a quiet, dark room, staying hydrated, and managing stress. If severe or persistent, seek medical advice."
     } else if (symptoms.includes('stomach') || symptoms.includes('nausea')) {
-      return "Stomach issues can be concerning. Are you experiencing any abdominal pain? Have you eaten anything unusual recently? Any fever or other symptoms?"
+      return "Stomach issues can be caused by food, stress, or infections. Try eating bland foods, staying hydrated, and avoiding spicy or fatty foods. If symptoms are severe, consult a doctor."
     } else {
-      return "I understand you're experiencing symptoms. To help you better, could you tell me: 1) How long have you had these symptoms? 2) How severe are they? 3) Are there any other symptoms you're experiencing?"
+      return "Thank you for sharing your symptoms. For personalized medical advice, please consult with a healthcare professional. Remember, this is general information and not a substitute for professional medical care."
     }
   }
 
@@ -89,10 +89,10 @@ const SymptomChat: React.FC = () => {
             </button>
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Bot className="w-5 h-5 text-blue-600" />
+                <MessageCircle className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900">AI Health Assistant</h3>
+                <h3 className="font-semibold text-gray-900">Health Assistant</h3>
                 <p className="text-sm text-gray-600">Online • Ready to help</p>
               </div>
             </div>

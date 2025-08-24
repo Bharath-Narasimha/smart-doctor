@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  smart-doctor-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - smart-doctor-network
+
+networks:
+  smart-doctor-network:
+    driver: bridge
